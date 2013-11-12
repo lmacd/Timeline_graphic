@@ -1,6 +1,10 @@
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+d3.json("timeline.json",function(data){
+    var canvas = d3.select("body").append("svg")
+    .attr("width", 600)
+    .attr("height",450);
+    
+    
+    
+});
 
 
