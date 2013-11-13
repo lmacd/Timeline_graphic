@@ -5,8 +5,13 @@
     Description:
         Purpose of the stylesheet follows.
 */
+#event
+{
+background-color:red;    
+}
 
-root { 
-    display: block;
+#event:hover
+{
+    cursor:pointer;
 }
 
