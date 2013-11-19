@@ -6,6 +6,10 @@ d3.json("timeline.json", function(data) {
      alert(monthMax);
      */
     
+    var event;
+    
+ //   var clicked=false;
+    
     var dataL = data.length; //returns number of timeline events
     
     var years =data.map(function(d){return d.year;}); //creates new array of only years
@@ -55,30 +59,36 @@ if (ySpan <= 1) //if the events all occurred within two years
     var linearScale = d3.scale.linear()
                             .domain([startingPoint,endingPoint])
                             .range([37,563]);
-    var dataScale=[];
+                    
+    var dataScale=[]; //stores the calibrated sizes
     
     
     for (var i = 0; i < dataL; i++) {
   dataScale[i] = linearScale(scale[i]);
 }
 
+var xAxis = d3.svg.axis()
+                  .scale(linearScale)
+                  .orient("bottom")
+                  .tickFormat(d3.format(Number.toPrecision));
+
 //var dataScale=scaledYears.slice(0); //creates a new array "dataScale" that is equivilant to scaledYears. ".slice" can be ommitted, if desired.
 
-    /*
-     for (var i = 0, len = info.length; i < len; i++) {
-     infoT = info.concat(info[i].year);
-     }*/
 
     var canvas = d3.select("body")
             .append("svg")
             .attr("width", 600)
             .attr("height", 450);
 
-
+                          
+                      
     var viewbox = canvas.append("rect")
             .attr("height", 450)
             .attr("width", 600)
-            .style("fill", "grey");
+            .style("fill", "#DBDBDB");
+
+
+    
 
     var timeline = canvas.append("rect")
             .attr("width", 550)
@@ -96,23 +106,84 @@ if (ySpan <= 1) //if the events all occurred within two years
             .attr("cy", 225)
             .attr("cx", function(d) {return d;})
             .attr("r", 7)
+            .style("stroke","#B53636")
+            .style("stroke-width",2)
             .style("fill", "white")
+    .on("mouseover", function(){
+ d3.select(this).transition().duration(400)
+            .attr("r",9)
+            .style("fill","#FFCCCC")
+            .style("cursor","pointer");
+    })
+    
+  
+ 
+    .on("click",function(){
+
+//clicked=true;
+
+ d3.select("#event").remove();
+
+ d3.select(this)
+        .transition()
+        .duration(200)
+        .attr("r",11)
+        .transition()
+        .duration(400)
+        .style("fill","B53636")
+        .attr("r",0);
+
+var circleX=d3.select(this).attr("cx")-10;
+var circleY=d3.select(this).attr("cy");
+
+ event = canvas.append("rect")
+    .attr("id","event")
+    .attr("width",20)
+    .attr("height",0)
+    .attr("transform","translate("+(circleX)+","+(circleY)+")")
+    .style("fill","white")
+    .attr("stroke","black")
+    .attr("stroke-width",1)
+    .attr("opacity",.25)
+    .transition()
+    .duration(1000)
+    .attr("opacity",1)
+    .attr("height",160)
+    .attr("transform","translate("+(circleX)+","+(circleY-80)+")")
+        .transition()
+        .duration(700)
+        .attr("width",300)
+        .attr("transform","translate("+(circleX-150)+","+(circleY-80)+")");
+    
+
+    })
+    
+      .on("mouseout", function(){
+//if(clicked===false){
+ d3.select(this).transition().duration(200)
+ .attr("r",7)
+ .style("fill","white")
+.style("cursor","default");
+//}
+})
+    
             .style('opacity',0)
-            .transition()
+            .transition() //transition open up new "bracket" sort of. You can't put any type of mouse event after it
             .duration(1000)
             .style('opacity',1);
+ 
+    
+    var xAxisGroup = canvas.append("g")
 
-    var lines = canvas.selectAll("line")
-            .data(data)
-            .enter()
-            .append("line")
-            .attr("x1", 2)
-            .attr("x2", 2)
-            .attr("y1", 180)
-            .attr("y2", 195)
-            //.text(function(d){return})
-            .attr("stroke", "black")
-            .attr("stroke-width", 3);
+                              .call(xAxis)
+                             .attr("transform","translate(0,200)")
+                              //.tickFormat(d3.time.format("%Y")) 
+                              .transition()
+                              .duration(1000)
+                              .attr("transform","translate(0,170)");
+
+  
+
 
     //d3.select("line").attr("x1") -> for returning "line"'s "x1" value
 
@@ -133,21 +204,5 @@ if (ySpan <= 1) //if the events all occurred within two years
 
 });
 
-/*var scaling =
-        {
-            run: function(d) {
-                if (years === true)
-                {
-                    return (d.year - 1900) * 10;
-                }
-                else if (months === true)
-                {
-                    return d.month * 28;
-                }
-                else if (days === true)
-                {
-                    return d.day * 10;
-                }
-            }}; */
 
 
